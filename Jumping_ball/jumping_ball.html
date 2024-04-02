@@ -28,11 +28,11 @@
     // Variables
     let ball;
     let background;
-    let gravity = 0.5;
+    let gravity = 0.3;
     let velocity = 0;
     let jumping = false;
-    let jumpForce = -10;
-    let groundY = app.renderer.height - 100;
+    let jumpForce = -28;
+    let groundY = app.renderer.height - 50;
     let clickCounter = 0;
     let counterText;
     // Add stable background color
@@ -71,6 +71,13 @@
         velocity = jumpForce;
         clickCounter++;
         updateCounterText();
+        changeBackgroundColor();
+      } else if (velocity > 0) {
+        // If the ball is already jumping, increase the jump force
+        velocity += jumpForce * 0.6;
+        clickCounter++;
+        updateCounterText();
+        changeBackgroundColor();
       }
     }
 
@@ -86,22 +93,23 @@
       app.stage.addChild(counterText);
     }
 
-    // Function to animate the ball
+    // Function to reset the counter and change background color to white when the ball hits the ground
     function animateBall() {
       velocity += gravity;
-      ball.y += velocity;
+      ball.y += velocity * 0.5;
 
       if (ball.y + ball.height / 2 > groundY) {
         ball.y = groundY - ball.height / 2;
         velocity = 0;
         jumping = false;
-        // Update background color only if the ball last hit the ground
-        if (!lastHitGround) { 
-          changeBackgroundColor();
-          lastHitGround = true;
-        }
-      } else {
-        lastHitGround = false;
+        // Update background color to white
+        background.clear();
+        background.beginFill(0xFFFFFF);
+        background.drawRect(0, 0, app.renderer.width, app.renderer.height);
+        background.endFill();
+        // Reset counter
+        clickCounter = 0;
+        updateCounterText();
       }
 
       requestAnimationFrame(animateBall);
