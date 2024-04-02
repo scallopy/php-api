@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+  webserver:
+    image: php:8.1-apache
+    container_name: PHP-webserver
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "./src/:/var/www/html/"
+    ports:
+      - 8002:80
+    depends_on:
+      - mysql-db
+
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8001:80
+    environment:
+      - PMA_HOST=mysql-db
+      - PMA_PORT=3306

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jumping Ball</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="pixi.min.js"></script>
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.1.3/pixi.min.js"></script>-->
+  <script>
+    // Create PIXI application
+    const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+
+    // Add the canvas to the HTML document
+    document.body.appendChild(app.view);
+
+    // Variables
+    let ball;
+    let background;
+    let gravity = 0.5;
+    let velocity = 0;
+    let jumping = false;
+    let jumpForce = -10;
+    let groundY = app.renderer.height - 100;
+    let clickCounter = 0;
+    let counterText;
+    // Add stable background color
+    let lastHitGround = true;
+
+    function createBackground() {
+      background = new PIXI.Graphics();
+      // Set initial background color to white
+      background.beginFill(0xFFFFFF); 
+      background.drawRect(0, 0, app.renderer.width, app.renderer.height);
+      background.endFill();
+      app.stage.addChild(background);
+    }
+
+    // Function to create a ball
+    function createBall() {
+      ball = new PIXI.Graphics();
+      ball.beginFill(0xFF0000);
+      ball.drawCircle(0, 0, 50);
+      ball.endFill();
+      ball.x = app.renderer.width / 2;
+      ball.y = groundY;
+      app.stage.addChild(ball);
+
+      ball.interactive = true;
+      ball.on('pointerdown', () => {
+        jump();
+      });
+    }
+
+    
+    // Function to jump the ball
+    function jump() {
+      if (!jumping) {
+        jumping = true;
+        velocity = jumpForce;
+        clickCounter++;
+        updateCounterText();
+      }
+    }
+
+    // Function to update the counter text
+    function updateCounterText() {
+      counterText.text = `Jump Counter: ${clickCounter}`;
+    }
+
+    // Function to create counter text
+    function createCounterText() {
+      counterText = new PIXI.Text(`Jump Counter: ${clickCounter}`, { fontFamily: 'Arial', fontSize: 24, fill: 0x000000 });
+      counterText.position.set(20, 20);
+      app.stage.addChild(counterText);
+    }
+
+    // Function to animate the ball
+    function animateBall() {
+      velocity += gravity;
+      ball.y += velocity;
+
+      if (ball.y + ball.height / 2 > groundY) {
+        ball.y = groundY - ball.height / 2;
+        velocity = 0;
+        jumping = false;
+        // Update background color only if the ball last hit the ground
+        if (!lastHitGround) { 
+          changeBackgroundColor();
+          lastHitGround = true;
+        }
+      } else {
+        lastHitGround = false;
+      }
+
+      requestAnimationFrame(animateBall);
+    }
+
+    // Function to change background color
+    function changeBackgroundColor() {
+      const randomColor = Math.random() * 0xFFFFFF;
+      background.clear();
+      background.beginFill(randomColor);
+      background.drawRect(0, 0, app.renderer.width, app.renderer.height);
+      background.endFill();
+    }
+
+    // Initialize the game
+    function init() {
+      createBackground();
+      createBall();
+      createCounterText();
+      animateBall();
+    }
+
+    init();
+  </script>
+</body>
+</html>
